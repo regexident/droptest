@@ -59,6 +59,7 @@ use std::{
     sync::Mutex,
 };
 
+/// The doptest prelude.
 pub mod prelude {
     pub use super::{
         assert_drop, assert_drop_stats, assert_no_drop, DropGuard, DropGuardId, DropRegistry,
