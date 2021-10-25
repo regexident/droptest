@@ -175,7 +175,7 @@ impl<'a> DropGuardId<'a> {
 
 impl<'a> fmt::Debug for DropGuardId<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.value.fmt(f)
+        f.debug_tuple("DropGuardId").field(&self.value).finish()
     }
 }
 
