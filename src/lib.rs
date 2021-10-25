@@ -9,7 +9,7 @@
 //! Ensure [`std::mem::drop`](http://doc.rust-lang.org/1.56.0/std/mem/fn.drop.html) does in fact drop:
 //!
 //! ```
-//! use droptest::{DropRegistry, assert_drop};
+//! use droptest::prelude::*;
 //!
 //! let registry = DropRegistry::default();
 //! let guard = registry.new_guard();
@@ -22,7 +22,7 @@
 //! Ensure [`std::mem::forget`](https://doc.rust-lang.org/stable/std/mem/fn.forget.html) does not drop:
 //!
 //! ```
-//! use droptest::{DropRegistry, assert_no_drop};
+//! use droptest::prelude::*;
 //!
 //! let registry = DropRegistry::default();
 //! let guard = registry.new_guard();
@@ -36,7 +36,7 @@
 //! only drops the when reference count reaches `0`:
 //!
 //! ```
-//! use droptest::{DropRegistry, assert_drop, assert_no_drop};
+//! use droptest::prelude::*;
 //!
 //! let registry = DropRegistry::default();
 //! let guard = registry.new_guard();
@@ -127,7 +127,7 @@ impl<'a, T> DropGuard<'a, T> {
     ///
     /// # Examples
     /// ```
-    /// use droptest::{DropRegistry, assert_no_drop};
+    /// use droptest::prelude::*;
     ///
     /// let registry = DropRegistry::default();
     /// let guard = registry.new_guard();
@@ -144,7 +144,7 @@ impl<'a, T> DropGuard<'a, T> {
     ///
     /// # Examples
     /// ```
-    /// use droptest::{DropRegistry, assert_no_drop};
+    /// use droptest::prelude::*;
     ///
     /// let registry = DropRegistry::default();
     /// let guard = registry.new_guard_for(42);
@@ -161,7 +161,7 @@ impl<'a, T> DropGuard<'a, T> {
     ///
     /// # Examples
     /// ```
-    /// use droptest::{DropRegistry, assert_no_drop};
+    /// use droptest::prelude::*;
     ///
     /// let registry = DropRegistry::default();
     /// let (id, guard) = registry.new_guard_for(42).by_id();
@@ -177,7 +177,7 @@ impl<'a, T> DropGuard<'a, T> {
     ///
     /// # Examples
     /// ```
-    /// use droptest::{DropRegistry, assert_no_drop};
+    /// use droptest::prelude::*;
     ///
     /// let registry = DropRegistry::default();
     /// let guard = registry.new_guard();
@@ -285,7 +285,7 @@ impl DropRegistry {
     ///
     /// # Examples
     /// ```
-    /// use droptest::{DropRegistry, assert_no_drop};
+    /// use droptest::prelude::*;
     ///
     /// let registry = DropRegistry::default();
     /// let guard = registry.new_guard_for(42);
@@ -312,7 +312,7 @@ impl DropRegistry {
     ///
     /// # Examples
     /// ```
-    /// use droptest::{DropRegistry, assert_no_drop};
+    /// use droptest::prelude::*;
     ///
     /// let registry = DropRegistry::default();
     /// let guard = registry.new_guard();
@@ -329,7 +329,7 @@ impl DropRegistry {
     ///
     /// # Examples
     /// ```
-    /// use droptest::{DropRegistry, assert_no_drop, DropStatistics};
+    /// use droptest::prelude::*;
     ///
     /// let registry = DropRegistry::default();
     /// let guard = registry.new_guard();
@@ -357,7 +357,7 @@ impl DropRegistry {
     ///
     /// # Examples
     /// ```
-    /// use droptest::DropRegistry;
+    /// use droptest::prelude::*;
     ///
     /// let registry = DropRegistry::default();
     /// let guard = registry.new_guard();
