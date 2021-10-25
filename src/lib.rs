@@ -411,33 +411,15 @@ mod tests {
     fn it_works() {
         let registry = DropRegistry::default();
 
-        assert_eq!(
-            registry.stats(),
-            DropStatistics {
-                created: 0,
-                dropped: 0
-            }
-        );
+        assert_drop_stats!(registry, { created: 0, dropped: 0 });
 
         let guard = registry.new_guard_for(42);
 
-        assert_eq!(
-            registry.stats(),
-            DropStatistics {
-                created: 1,
-                dropped: 0
-            }
-        );
+        assert_drop_stats!(registry, { created: 1, dropped: 0 });
 
         std::mem::drop(guard);
 
-        assert_eq!(
-            registry.stats(),
-            DropStatistics {
-                created: 1,
-                dropped: 1
-            }
-        );
+        assert_drop_stats!(registry, { created: 1, dropped: 1 });
     }
 
     #[test]
@@ -480,61 +462,29 @@ mod tests {
     fn clone() {
         let registry = DropRegistry::default();
 
-        assert_eq!(
-            registry.stats(),
-            DropStatistics {
-                created: 0,
-                dropped: 0
-            }
-        );
+        assert_drop_stats!(registry, { created: 0, dropped: 0 });
 
         let guard = registry.new_guard_for(42);
         let guard_id = guard.id();
 
-        assert_eq!(
-            registry.stats(),
-            DropStatistics {
-                created: 1,
-                dropped: 0
-            }
-        );
+        assert_drop_stats!(registry, { created: 1, dropped: 0 });
 
         let cloned_guard = guard.clone();
         let cloned_guard_id = cloned_guard.id();
 
-        assert_eq!(
-            registry.stats(),
-            DropStatistics {
-                created: 2,
-                dropped: 0
-            }
-        );
+        assert_drop_stats!(registry, { created: 2, dropped: 0 });
 
         std::mem::drop(guard);
 
         assert_drop!(registry, guard_id);
-        assert!(!registry.is_dropped(cloned_guard_id));
-
-        assert_eq!(
-            registry.stats(),
-            DropStatistics {
-                created: 2,
-                dropped: 1
-            }
-        );
+        assert_no_drop!(registry, cloned_guard_id);
+        assert_drop_stats!(registry, { created: 2, dropped: 1 });
 
         std::mem::drop(cloned_guard);
 
         assert_drop!(registry, guard_id);
-        assert!(registry.is_dropped(cloned_guard_id));
-
-        assert_eq!(
-            registry.stats(),
-            DropStatistics {
-                created: 2,
-                dropped: 2
-            }
-        );
+        assert_drop!(registry, cloned_guard_id);
+        assert_drop_stats!(registry, { created: 2, dropped: 2 });
     }
 
     #[test]
