@@ -1,6 +1,8 @@
 # droptest
 
-[![Build Status](http://img.shields.io/travis/regexident/droptest.svg?style=flat-square)](https://travis-ci.org/regexident/droptest)
+
+
+[![Checks](https://img.shields.io/github/checks-status/regexident/droptest/main?style=flat-square)](https://github.com/regexident/droptest/)
 [![Downloads](https://img.shields.io/crates/d/droptest.svg?style=flat-square)](https://crates.io/crates/droptest/)
 [![Version](https://img.shields.io/crates/v/droptest.svg?style=flat-square)](https://crates.io/crates/droptest/)
 [![License](https://img.shields.io/crates/l/droptest.svg?style=flat-square)](https://crates.io/crates/droptest/)
