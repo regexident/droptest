@@ -66,14 +66,6 @@ pub mod prelude {
     };
 }
 
-// TODO(regexident): remove in ">= v0.2.0".
-#[deprecated(note = "please use `DropStatistics` instead")]
-pub use DropStatistics as Statistics;
-
-// TODO(regexident): remove in ">= v0.2.0".
-#[deprecated(note = "please use `DropGuardId` instead")]
-pub use DropGuardId as DropId;
-
 #[macro_export]
 macro_rules! assert_drop {
     ($registry:expr, $guard_id:expr) => {
