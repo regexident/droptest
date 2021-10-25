@@ -80,10 +80,10 @@ macro_rules! assert_drop {
 #[macro_export]
 macro_rules! assert_no_drop {
     ($registry:expr, $guard_id:expr) => {
-        assert!(!$registry.is_dropped($guard_id), "expected no drop.");
+        assert!(!$registry.is_dropped($guard_id), "expected no drop for {:?}.", $guard_id);
     };
     ($registry:expr, $guard_id:expr $(,$message:tt)*) => {
-        assert!(!$registry.is_dropped($guard_id), "expected no drop: {}", format!($($message)+));
+        assert!(!$registry.is_dropped($guard_id), "expected no drop for {:?}: {}", $guard_id, format!($($message)+));
     };
 }
 
