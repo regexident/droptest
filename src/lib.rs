@@ -121,6 +121,26 @@ macro_rules! assert_no_drop {
     };
 }
 
+/// Asserts that the registry's current stats match the provided pattern.
+///
+/// Like assert!, this macro has a second form, where a custom panic message can be provided.
+///
+/// # Examples
+/// ```
+/// use droptest::prelude::*;
+///
+/// let registry = DropRegistry::default();
+/// let guard = registry.new_guard();
+/// let id = guard.id();
+///
+/// assert_drop_stats!(registry, { created: 1 });
+/// // or:
+/// assert_drop_stats!(registry, { dropped: 0 });
+/// // or:
+/// assert_drop_stats!(registry, { created: 1, dropped: 0 });
+/// // or:
+/// assert_drop_stats!(registry, { created: 1, dropped: 0 }, "an optional message");
+/// ```
 #[macro_export]
 macro_rules! assert_drop_stats {
     ($registry:expr, { $($field:ident: $expected:expr),+ }) => {
