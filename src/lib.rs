@@ -95,6 +95,22 @@ macro_rules! assert_drop {
     };
 }
 
+/// Asserts that the registry has not registered a drop for the given id.
+///
+/// Like assert!, this macro has a second form, where a custom panic message can be provided.
+///
+/// # Examples
+/// ```
+/// use droptest::prelude::*;
+///
+/// let registry = DropRegistry::default();
+/// let guard = registry.new_guard();
+/// let id = guard.id();
+///
+/// assert_no_drop!(registry, id);
+/// // or:
+/// assert_no_drop!(registry, id, "an optional message");
+/// ```
 #[macro_export]
 macro_rules! assert_no_drop {
     ($registry:expr, $guard_id:expr) => {
