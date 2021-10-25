@@ -144,16 +144,18 @@ macro_rules! assert_no_drop {
 #[macro_export]
 macro_rules! assert_drop_stats {
     ($registry:expr, { $($field:ident: $expected:expr),+ }) => {
-        assert!(matches!($registry.stats(), $crate::DropStatistics {
+        let stats = $registry.stats();
+        assert!(matches!(&stats, $crate::DropStatistics {
             $($field: $expected,)*
             ..
-        }), concat!("expected {{ ", stringify!($($field: $expected),*), " }}"));
+        }), concat!("{:?} != DropStatistics {{ ", stringify!($($field: $expected),*), ", .. }}"), stats);
     };
     ($registry:expr, { $($field:ident: $expected:expr),+ } $(,$message:tt)*) => {
-        assert!(matches!($registry.stats(), $crate::DropStatistics {
+        let stats = $registry.stats();
+        assert!(matches!(&stats, $crate::DropStatistics {
             $($field: $expected,)*
             ..
-        }), concat!("expected {{ ", stringify!($($field: $expected),*), " }}: {}"), format!($($message)+));
+        }), concat!("{:?} != DropStatistics {{ ", stringify!($($field: $expected),*), ", .. }}: {}"), stats, format!($($message)+));
     };
 }
 
