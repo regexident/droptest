@@ -60,8 +60,18 @@ use std::{
 };
 
 pub mod prelude {
-    pub use super::{assert_drop, assert_no_drop, DropGuard, DropId, DropRegistry};
+    pub use super::{
+        assert_drop, assert_no_drop, DropGuard, DropGuardId, DropRegistry, DropStatistics,
+    };
 }
+
+// TODO(regexident): remove in ">= v0.2.0".
+#[deprecated(note = "please use `DropStatistics` instead")]
+pub use DropStatistics as Statistics;
+
+// TODO(regexident): remove in ">= v0.2.0".
+#[deprecated(note = "please use `DropGuardId` instead")]
+pub use DropGuardId as DropId;
 
 #[macro_export]
 macro_rules! assert_drop {
@@ -85,12 +95,12 @@ macro_rules! assert_no_drop {
 
 /// An identifier associated with a registry's individual registered guards.
 #[derive(Default, Eq, PartialEq, Ord, PartialOrd, Copy, Clone)]
-pub struct DropId<'a> {
+pub struct DropGuardId<'a> {
     value: usize,
     _phantom: PhantomData<&'a DropRegistry>,
 }
 
-impl<'a> DropId<'a> {
+impl<'a> DropGuardId<'a> {
     fn new(value: usize) -> Self {
         Self {
             value,
@@ -99,7 +109,7 @@ impl<'a> DropId<'a> {
     }
 }
 
-impl<'a> fmt::Debug for DropId<'a> {
+impl<'a> fmt::Debug for DropGuardId<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.value.fmt(f)
     }
@@ -107,7 +117,7 @@ impl<'a> fmt::Debug for DropId<'a> {
 
 /// A guard object that reports to its registry when it gets dropped.
 pub struct DropGuard<'a, T> {
-    id: DropId<'a>,
+    id: DropGuardId<'a>,
     value: T,
     registry: &'a DropRegistry,
 }
@@ -126,7 +136,7 @@ impl<'a, T> DropGuard<'a, T> {
     /// assert_no_drop!(registry, id);
     /// ```
     #[inline]
-    pub fn id(&self) -> DropId<'a> {
+    pub fn id(&self) -> DropGuardId<'a> {
         self.id
     }
 
@@ -159,7 +169,7 @@ impl<'a, T> DropGuard<'a, T> {
     /// assert_no_drop!(registry, id);
     /// ```
     #[inline]
-    pub fn by_id(self) -> (DropId<'a>, Self) {
+    pub fn by_id(self) -> (DropGuardId<'a>, Self) {
         (self.id(), self)
     }
 
@@ -248,7 +258,7 @@ where
 
 /// A snapshot for a registry's statistics at a given time.
 #[derive(Default, Eq, PartialEq, Debug)]
-pub struct Statistics {
+pub struct DropStatistics {
     /// Number of guards created by the corresponding registry.
     pub created: usize,
     /// Number of guards dropped by the corresponding registry.
@@ -286,7 +296,7 @@ impl DropRegistry {
     pub fn new_guard_for<T>(&self, value: T) -> DropGuard<'_, T> {
         let guard_states = &mut self.guard_states.lock().unwrap();
 
-        let id = DropId::new(guard_states.len());
+        let id = DropGuardId::new(guard_states.len());
         guard_states.push(DropGuardState::Alive);
 
         let registry = self;
@@ -319,20 +329,20 @@ impl DropRegistry {
     ///
     /// # Examples
     /// ```
-    /// use droptest::{DropRegistry, assert_no_drop, Statistics};
+    /// use droptest::{DropRegistry, assert_no_drop, DropStatistics};
     ///
     /// let registry = DropRegistry::default();
     /// let guard = registry.new_guard();
     /// let stats = registry.stats();
     ///
-    /// assert_eq!(stats, Statistics {
+    /// assert_eq!(stats, DropStatistics {
     ///     created: 1,
     ///     dropped: 0
     /// });
     /// ```
-    pub fn stats(&self) -> Statistics {
+    pub fn stats(&self) -> DropStatistics {
         let guard_states = &self.guard_states.lock().unwrap();
-        let mut stats = Statistics::default();
+        let mut stats = DropStatistics::default();
         for guard_state in guard_states.iter() {
             stats.created += 1;
             match *guard_state {
@@ -360,13 +370,13 @@ impl DropRegistry {
     /// assert!(registry.is_dropped(guard_id));
     /// ```
     #[inline]
-    pub fn is_dropped<'a>(&'a self, id: DropId<'a>) -> bool {
+    pub fn is_dropped<'a>(&'a self, id: DropGuardId<'a>) -> bool {
         let guard_states = &self.guard_states.lock().unwrap();
         let id_value = id.value;
         guard_states[id_value] == DropGuardState::Dropped
     }
 
-    fn on_drop<'a>(&'a self, id: DropId<'a>) {
+    fn on_drop<'a>(&'a self, id: DropGuardId<'a>) {
         let guard_states = &mut self.guard_states.lock().unwrap();
         let id_value = id.value;
         if guard_states[id_value] == DropGuardState::Dropped {
@@ -386,7 +396,7 @@ mod tests {
 
         assert_eq!(
             registry.stats(),
-            Statistics {
+            DropStatistics {
                 created: 0,
                 dropped: 0
             }
@@ -396,7 +406,7 @@ mod tests {
 
         assert_eq!(
             registry.stats(),
-            Statistics {
+            DropStatistics {
                 created: 1,
                 dropped: 0
             }
@@ -406,7 +416,7 @@ mod tests {
 
         assert_eq!(
             registry.stats(),
-            Statistics {
+            DropStatistics {
                 created: 1,
                 dropped: 1
             }
@@ -455,7 +465,7 @@ mod tests {
 
         assert_eq!(
             registry.stats(),
-            Statistics {
+            DropStatistics {
                 created: 0,
                 dropped: 0
             }
@@ -466,7 +476,7 @@ mod tests {
 
         assert_eq!(
             registry.stats(),
-            Statistics {
+            DropStatistics {
                 created: 1,
                 dropped: 0
             }
@@ -477,7 +487,7 @@ mod tests {
 
         assert_eq!(
             registry.stats(),
-            Statistics {
+            DropStatistics {
                 created: 2,
                 dropped: 0
             }
@@ -490,7 +500,7 @@ mod tests {
 
         assert_eq!(
             registry.stats(),
-            Statistics {
+            DropStatistics {
                 created: 2,
                 dropped: 1
             }
@@ -503,7 +513,7 @@ mod tests {
 
         assert_eq!(
             registry.stats(),
-            Statistics {
+            DropStatistics {
                 created: 2,
                 dropped: 2
             }
