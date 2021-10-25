@@ -61,7 +61,8 @@ use std::{
 
 pub mod prelude {
     pub use super::{
-        assert_drop, assert_no_drop, DropGuard, DropGuardId, DropRegistry, DropStatistics,
+        assert_drop, assert_drop_stats, assert_no_drop, DropGuard, DropGuardId, DropRegistry,
+        DropStatistics,
     };
 }
 
@@ -90,6 +91,22 @@ macro_rules! assert_no_drop {
     };
     ($registry:expr, $guard_id:expr $(,$message:tt)*) => {
         assert!(!$registry.is_dropped($guard_id), "expected no drop: {}", format!($($message)+));
+    };
+}
+
+#[macro_export]
+macro_rules! assert_drop_stats {
+    ($registry:expr, { $($field:ident: $expected:expr),+ }) => {
+        assert!(matches!($registry.stats(), $crate::DropStatistics {
+            $($field: $expected,)*
+            ..
+        }), concat!("expected {{ ", stringify!($($field: $expected),*), " }}"));
+    };
+    ($registry:expr, { $($field:ident: $expected:expr),+ } $(,$message:tt)*) => {
+        assert!(matches!($registry.stats(), $crate::DropStatistics {
+            $($field: $expected,)*
+            ..
+        }), concat!("expected {{ ", stringify!($($field: $expected),*), " }}: {}"), format!($($message)+));
     };
 }
 
