@@ -70,10 +70,10 @@ pub mod prelude {
 #[macro_export]
 macro_rules! assert_drop {
     ($registry:expr, $guard_id:expr) => {
-        assert!($registry.is_dropped($guard_id), "expected drop.");
+        assert!($registry.is_dropped($guard_id), "expected drop for {:?}.", $guard_id);
     };
     ($registry:expr, $guard_id:expr $(,$message:tt)+) => {
-        assert!($registry.is_dropped($guard_id), "expected drop: {}", format!($($message)+));
+        assert!($registry.is_dropped($guard_id), "expected drop for {:?}: {}", $guard_id, format!($($message)+));
     };
 }
 
